@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
-import { Compass } from 'lucide-react';
+import { Compass, Edit3 } from 'lucide-react';
 
 export const FuturesMatrix = () => {
   const [factorA, setFactorA] = useState('Siber Saldırı Yoğunluğu');
   const [factorB, setFactorB] = useState('Uluslararası Regülasyon Baskısı');
+
+  const [scenarios, setScenarios] = useState({
+    q1: 'Aktörler yoğun siber yıpratma savaşı yürütürken ağır yaptırım ve regülatif izolasyon ile karşılaşırlar.',
+    q2: 'Diplomatik ve ekonomik yaptırımlar egemen olur; aktörler doğrudan eylemler yerine örtülü ve proxy yöntemleri tercih eder.',
+    q3: 'Statüko korunur veya dondurulmuş çatışma evresine geçilir; istihbari faaliyetler düşük yoğunluklu izleme ile sınırlı kalır.',
+    q4: 'Hukuki ve uluslararası denetimin olmadığı serbest bir dijital gri alan; aktörlerin maksimum kazanım sağladığı vahşi dönem.',
+  });
+
+  const updateScenario = (quadrant, text) => {
+    setScenarios((prev) => ({ ...prev, [quadrant]: text }));
+  };
 
   return (
     <div className="bg-cyber-panel border border-cyber-border rounded-lg p-5 space-y-4 shadow-lg">
@@ -14,7 +25,7 @@ export const FuturesMatrix = () => {
             <span className="text-cyber-accent">#06</span> Alternatif Gelecekler Matrisi (Futures Matrix)
           </h2>
           <p className="text-xs text-gray-400 mt-0.5">
-            İki temel belirsizlik ekseni belirleyerek 4 farklı olası senaryo kadranı oluşturun.
+            İki temel stratejik belirsizlik ekseni belirleyerek 4 farklı olası senaryo kadranı kurgulayın.
           </p>
         </div>
       </div>
@@ -22,7 +33,7 @@ export const FuturesMatrix = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
           <label className="text-[11px] font-mono text-gray-400 block mb-1">
-            Yatay Eksen (X Faktörü):
+            Yatay Eksen (X Faktörü / Birincil Belirsizlik):
           </label>
           <input
             type="text"
@@ -33,7 +44,7 @@ export const FuturesMatrix = () => {
         </div>
         <div>
           <label className="text-[11px] font-mono text-gray-400 block mb-1">
-            Dikey Eksen (Y Faktörü):
+            Dikey Eksen (Y Faktörü / İkincil Belirsizlik):
           </label>
           <input
             type="text"
@@ -45,40 +56,56 @@ export const FuturesMatrix = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-        <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-1">
-          <div className="text-xs font-mono font-bold text-cyber-accent">
-            Kadran I: Yüksek {factorA} & Yüksek {factorB}
+        {/* Kadran 1 */}
+        <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-2">
+          <div className="flex justify-between items-center text-xs font-mono font-bold text-cyber-accent">
+            <span>Kadran I: Yüksek {factorA} & Yüksek {factorB}</span>
           </div>
-          <p className="text-[11px] text-gray-300">
-            Aktörler yoğun siber yıpratma savaşı yürütürken ağır yaptırım ve regülatif izolasyon ile karşılaşırlar.
-          </p>
+          <textarea
+            rows={2}
+            value={scenarios.q1}
+            onChange={(e) => updateScenario('q1', e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border/60 rounded p-2 text-[11px] text-gray-200 focus:outline-none focus:border-cyber-accent"
+          />
         </div>
 
-        <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-1">
-          <div className="text-xs font-mono font-bold text-cyber-warning">
-            Kadran II: Düşük {factorA} & Yüksek {factorB}
+        {/* Kadran 2 */}
+        <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-2">
+          <div className="flex justify-between items-center text-xs font-mono font-bold text-cyber-warning">
+            <span>Kadran II: Düşük {factorA} & Yüksek {factorB}</span>
           </div>
-          <p className="text-[11px] text-gray-300">
-            Diplomatik ve ekonomik yaptırımlar egemen olur; aktörler doğrudan eylemler yerine örtülü ve proxy yöntemleri tercih eder.
-          </p>
+          <textarea
+            rows={2}
+            value={scenarios.q2}
+            onChange={(e) => updateScenario('q2', e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border/60 rounded p-2 text-[11px] text-gray-200 focus:outline-none focus:border-cyber-accent"
+          />
         </div>
 
-        <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-1">
-          <div className="text-xs font-mono font-bold text-gray-400">
-            Kadran III: Düşük {factorA} & Düşük {factorB}
+        {/* Kadran 3 */}
+        <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-2">
+          <div className="flex justify-between items-center text-xs font-mono font-bold text-gray-400">
+            <span>Kadran III: Düşük {factorA} & Düşük {factorB}</span>
           </div>
-          <p className="text-[11px] text-gray-300">
-            Statüko korunur veya dondurulmuş çatışma evresine geçilir; istihbari faaliyetler düşük yoğunluklu istihbarat toplama ile sınırlı kalır.
-          </p>
+          <textarea
+            rows={2}
+            value={scenarios.q3}
+            onChange={(e) => updateScenario('q3', e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border/60 rounded p-2 text-[11px] text-gray-200 focus:outline-none focus:border-cyber-accent"
+          />
         </div>
 
-        <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-1">
-          <div className="text-xs font-mono font-bold text-cyber-winner">
-            Kadran IV: Yüksek {factorA} & Düşük {factorB}
+        {/* Kadran 4 */}
+        <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-2">
+          <div className="flex justify-between items-center text-xs font-mono font-bold text-cyber-winner">
+            <span>Kadran IV: Yüksek {factorA} & Düşük {factorB}</span>
           </div>
-          <p className="text-[11px] text-gray-300">
-            Hukuki ve uluslararası denetimin olmadığı serbest bir dijital gri alan; aktörlerin maksimum kazanım sağladığı vahşi dönem.
-          </p>
+          <textarea
+            rows={2}
+            value={scenarios.q4}
+            onChange={(e) => updateScenario('q4', e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border/60 rounded p-2 text-[11px] text-gray-200 focus:outline-none focus:border-cyber-accent"
+          />
         </div>
       </div>
     </div>

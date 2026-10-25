@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useOsint } from '../context/OsintContext';
 import { analyzeOsintWithGemini } from '../services/gemini';
-import { Sparkles, Key, CheckCircle, AlertTriangle, Send } from 'lucide-react';
+import { Sparkles, Key, CheckCircle, AlertTriangle, Send, Cpu } from 'lucide-react';
 
 export const GeminiHypothesisAssistant = () => {
   const { caseData, upsertBenefitScore, addOsintEntity } = useOsint();
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('CUIBONO_KEY') || '');
+  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
   const [osintText, setOsintText] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -30,7 +31,8 @@ export const GeminiHypothesisAssistant = () => {
         apiKey,
         osintText,
         caseData.event?.title || '',
-        caseData.actors || []
+        caseData.actors || [],
+        selectedModel
       );
       setSynthesis(res.executiveSynthesis);
       setSuggestions(res.suggestions || []);
@@ -77,14 +79,14 @@ export const GeminiHypothesisAssistant = () => {
             <span className="text-cyber-accent">#05</span> Gemini AI Otomatik Matris & Hipotez Motoru
           </h2>
           <p className="text-xs text-gray-400 mt-0.5">
-            Ham haber, istihbarat bülteni veya sızıntı metnini yapıştırın; yapay zeka aktör çıkarlarını ve hipotezleri çıkarsın.
+            Ham haber, istihbarat bülteni veya sızıntı metnini yapıştırın; yapay zeka aktör çıkarlarını ve hipotezleri otomatik çıkarsın.
           </p>
         </div>
       </div>
 
       <form onSubmit={handleAnalyze} className="space-y-3">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div className="relative col-span-1 sm:col-span-2">
             <Key size={14} className="absolute left-3 top-3 text-gray-400" />
             <input
               type="password"
@@ -93,6 +95,19 @@ export const GeminiHypothesisAssistant = () => {
               placeholder="Google Gemini API Anahtarınız (AI Studio / Vertex AI)"
               className="w-full bg-cyber-bg border border-cyber-border rounded pl-9 pr-3 py-2 text-xs text-white font-mono focus:border-cyber-accent focus:outline-none"
             />
+          </div>
+
+          <div className="relative">
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="w-full bg-cyber-bg border border-cyber-border rounded px-3 py-2 text-xs text-white font-mono focus:border-cyber-accent focus:outline-none"
+            >
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Önerilen)</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+            </select>
           </div>
         </div>
 
@@ -106,7 +121,7 @@ export const GeminiHypothesisAssistant = () => {
 
         <div className="flex justify-between items-center">
           <span className="text-[11px] text-gray-500 font-mono">
-            Model: Gemini 2.5 Flash | Yanıtlar istemci tarafında yerel işlenir.
+            Model: {selectedModel} | İstemci tarafı yerel API çağrısı
           </span>
           <button
             type="submit"
