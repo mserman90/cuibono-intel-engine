@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Compass, Edit3 } from 'lucide-react';
+import { Tooltip, InfoTooltip } from './Tooltip';
 
 export const FuturesMatrix = () => {
   const [factorA, setFactorA] = useState('Siber Saldırı Yoğunluğu');
@@ -23,6 +24,7 @@ export const FuturesMatrix = () => {
           <h2 className="text-xl font-mono font-bold text-white flex items-center gap-2">
             <Compass className="text-cyber-accent" size={20} />
             <span className="text-cyber-accent">#06</span> Alternatif Gelecekler Matrisi (Futures Matrix)
+            <InfoTooltip text="İki bağımsız temel belirsizlik faktörünü eksen alarak (X ve Y) 4 farklı stratejik gelecek senaryosu kurgulayan SATs tekniği." />
           </h2>
           <p className="text-xs text-gray-400 mt-0.5">
             İki temel stratejik belirsizlik ekseni belirleyerek 4 farklı olası senaryo kadranı kurgulayın.
@@ -32,8 +34,9 @@ export const FuturesMatrix = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <label className="text-[11px] font-mono text-gray-400 block mb-1">
-            Yatay Eksen (X Faktörü / Birincil Belirsizlik):
+          <label className="text-[11px] font-mono text-gray-400 flex items-center gap-1 mb-1">
+            Yatay Eksen (X Faktörü / Birincil Belirsizlik)
+            <InfoTooltip text="Olayın seyrini en çok etkileyecek birinci kritik belirsizlik parametresi (Örn: 'Siber Saldırı Şiddeti', 'Askeri Gerilim')." />
           </label>
           <input
             type="text"
@@ -43,8 +46,9 @@ export const FuturesMatrix = () => {
           />
         </div>
         <div>
-          <label className="text-[11px] font-mono text-gray-400 block mb-1">
-            Dikey Eksen (Y Faktörü / İkincil Belirsizlik):
+          <label className="text-[11px] font-mono text-gray-400 flex items-center gap-1 mb-1">
+            Dikey Eksen (Y Faktörü / İkincil Belirsizlik)
+            <InfoTooltip text="Birinci faktörden bağımsız ikinci kritik parametre (Örn: 'Uluslararası Yaptırımlar', 'İttifak Dayanışması')." />
           </label>
           <input
             type="text"
@@ -59,7 +63,9 @@ export const FuturesMatrix = () => {
         {/* Kadran 1 */}
         <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-2">
           <div className="flex justify-between items-center text-xs font-mono font-bold text-cyber-accent">
-            <span>Kadran I: Yüksek {factorA} & Yüksek {factorB}</span>
+            <Tooltip content="Her iki faktörün de en yüksek derecede gerçekleştiği senaryo.">
+              <span className="cursor-help">Kadran I: Yüksek {factorA} & Yüksek {factorB}</span>
+            </Tooltip>
           </div>
           <textarea
             rows={2}
@@ -72,7 +78,9 @@ export const FuturesMatrix = () => {
         {/* Kadran 2 */}
         <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-2">
           <div className="flex justify-between items-center text-xs font-mono font-bold text-cyber-warning">
-            <span>Kadran II: Düşük {factorA} & Yüksek {factorB}</span>
+            <Tooltip content="Birincil faktörün düşük, ikincil faktörün yüksek olduğu senaryo.">
+              <span className="cursor-help">Kadran II: Düşük {factorA} & Yüksek {factorB}</span>
+            </Tooltip>
           </div>
           <textarea
             rows={2}
@@ -85,7 +93,9 @@ export const FuturesMatrix = () => {
         {/* Kadran 3 */}
         <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-2">
           <div className="flex justify-between items-center text-xs font-mono font-bold text-gray-400">
-            <span>Kadran III: Düşük {factorA} & Düşük {factorB}</span>
+            <Tooltip content="Her iki belirsizlik faktörünün de sönümlendiği statüko senaryosu.">
+              <span className="cursor-help">Kadran III: Düşük {factorA} & Düşük {factorB}</span>
+            </Tooltip>
           </div>
           <textarea
             rows={2}
@@ -98,7 +108,9 @@ export const FuturesMatrix = () => {
         {/* Kadran 4 */}
         <div className="bg-cyber-bg p-3.5 rounded border border-cyber-border/70 space-y-2">
           <div className="flex justify-between items-center text-xs font-mono font-bold text-cyber-winner">
-            <span>Kadran IV: Yüksek {factorA} & Düşük {factorB}</span>
+            <Tooltip content="Birincil faktörün yüksek, ikincil faktörün denetimsiz/düşük kaldığı asimetrik kazanç senaryosu.">
+              <span className="cursor-help">Kadran IV: Yüksek {factorA} & Düşük {factorB}</span>
+            </Tooltip>
           </div>
           <textarea
             rows={2}

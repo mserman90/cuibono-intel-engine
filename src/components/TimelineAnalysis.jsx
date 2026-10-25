@@ -1,6 +1,7 @@
 import React from 'react';
 import { useOsint } from '../context/OsintContext';
 import { Clock, Calendar, FileText } from 'lucide-react';
+import { Tooltip, InfoTooltip } from './Tooltip';
 
 export const TimelineAnalysis = () => {
   const { caseData } = useOsint();
@@ -38,6 +39,7 @@ export const TimelineAnalysis = () => {
           <h2 className="text-xl font-mono font-bold text-white flex items-center gap-2">
             <Clock className="text-cyber-accent" size={20} />
             <span className="text-cyber-accent">#08</span> Zaman Çizelgesi & Olay Kronolojisi
+            <InfoTooltip text="Ana güvenlik olayı ile toplanan istihbarat kanıtlarının kronolojik dikey zaman çizelgesi üzerindeki akışı." />
           </h2>
           <p className="text-xs text-gray-400 mt-0.5">
             Olayların ve tespit edilen istihbarat kanıtlarının kronolojik akışı.
@@ -61,21 +63,23 @@ export const TimelineAnalysis = () => {
                   <span className="text-xs font-mono font-bold text-cyber-accent flex items-center gap-1.5">
                     <Calendar size={12} /> {item.date}
                   </span>
-                  <span
-                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                      item.type === 'INCIDENT'
-                        ? 'bg-amber-950 text-amber-300 border border-amber-800'
-                        : 'bg-cyan-950 text-cyan-300 border border-cyan-800'
-                    }`}
-                  >
-                    {item.type === 'INCIDENT' ? 'ANA OLAY' : 'KANIT / İSTİHBARAT'}
-                  </span>
+                  <Tooltip content={item.type === 'INCIDENT' ? 'Ana kriz / olay tarihi' : 'Tespit edilen delil veya teknik iz tarihi'}>
+                    <span
+                      className={`text-[10px] font-mono px-1.5 py-0.5 rounded cursor-help ${
+                        item.type === 'INCIDENT'
+                          ? 'bg-amber-950 text-amber-300 border border-amber-800'
+                          : 'bg-cyan-950 text-cyan-300 border border-cyan-800'
+                      }`}
+                    >
+                      {item.type === 'INCIDENT' ? 'ANA OLAY' : 'KANIT / İSTİHBARAT'}
+                    </span>
+                  </Tooltip>
                 </div>
 
                 <div className="text-xs font-semibold text-white font-mono">{item.title}</div>
                 {item.desc && <p className="text-[11px] text-gray-300 font-sans">{item.desc}</p>}
                 {item.ref && (
-                  <div className="text-[10px] text-gray-400 font-mono truncate">
+                  <div className="text-[10px] text-gray-400 font-mono truncate" title={item.ref}>
                     Ref: {item.ref}
                   </div>
                 )}

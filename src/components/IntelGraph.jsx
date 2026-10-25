@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOsint } from '../context/OsintContext';
 import { FullscreenToggle } from './FullscreenToggle';
 import { getAllCustomIconsFromIndexedDB, saveCustomIconToIndexedDB } from '../services/db';
+import { Tooltip, InfoTooltip } from './Tooltip';
 import {
   Network,
   Plus,
@@ -107,6 +108,7 @@ export const IntelGraph = () => {
           <h2 className="text-xl font-mono font-bold text-white flex items-center gap-2">
             <Network className="text-cyber-accent" size={20} />
             <span className="text-cyber-accent">#04</span> Çıkar Ağ Grafiği & OSINT Varlık Şablonları
+            <InfoTooltip text="Olay, aktörler ve bu aktörlere bağlı açık kaynak dijital varlıkları (sosyal medya, kripto cüzdan, IP, araç) arasındaki hiyerarşik bağ grafiği." />
           </h2>
           <p className="text-xs text-gray-400 mt-0.5">
             Olay &rarr; Aktörler &rarr; OSINT Düğümleri (sosyal medya, kripto hesapları, IP/domain) hiyerarşik bağ analizi.
@@ -115,18 +117,25 @@ export const IntelGraph = () => {
         <div className="flex items-center gap-2">
           {/* Kategori Filtresi */}
           <div className="flex bg-cyber-bg border border-cyber-border rounded text-[11px] font-mono">
-            {['ALL', 'SOCIAL_MEDIA', 'CRYPTO_WALLET', 'VEHICLE', 'DOMAIN_IP'].map((f) => (
-              <button
-                key={f}
-                onClick={() => setActiveFilter(f)}
-                className={`px-2 py-1 transition-colors ${
-                  activeFilter === f
-                    ? 'bg-cyber-accent text-black font-bold'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                {f === 'ALL' ? 'Tümü' : f.split('_')[0]}
-              </button>
+            {[
+              { id: 'ALL', label: 'Tümü', tip: 'Tüm OSINT varlık kategorilerini gösterir.' },
+              { id: 'SOCIAL_MEDIA', label: 'Sosyal', tip: 'X/Twitter, Telegram veya sosyal medya hesapları.' },
+              { id: 'CRYPTO_WALLET', label: 'Kripto', tip: 'ETH, BTC veya fon transfer cüzdan adresleri.' },
+              { id: 'VEHICLE', label: 'Varlık', tip: 'Kayıtlı araç, plaka veya lojistik varlıklar.' },
+              { id: 'DOMAIN_IP', label: 'Domain', tip: 'C2 sunucuları, ASN veya IP adresleri.' },
+            ].map((f) => (
+              <Tooltip key={f.id} content={f.tip}>
+                <button
+                  onClick={() => setActiveFilter(f.id)}
+                  className={`px-2 py-1 transition-colors ${
+                    activeFilter === f.id
+                      ? 'bg-cyber-accent text-black font-bold'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              </Tooltip>
             ))}
           </div>
           <FullscreenToggle targetId="intel-graph-wrapper" />
@@ -138,43 +147,51 @@ export const IntelGraph = () => {
         onSubmit={handleAddEntity}
         className="bg-cyber-bg p-3.5 rounded border border-cyber-border grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2.5"
       >
-        <select
-          value={linkedActorId || actors[0]?.id || ''}
-          onChange={(e) => setLinkedActorId(e.target.value)}
-          className="bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-white focus:border-cyber-accent focus:outline-none"
-        >
-          {actors.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
+        <Tooltip content="Bu OSINT verisinin hangi aktör ile ilişkili olduğunu seçin." className="w-full">
+          <select
+            value={linkedActorId || actors[0]?.id || ''}
+            onChange={(e) => setLinkedActorId(e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-white focus:border-cyber-accent focus:outline-none cursor-pointer"
+          >
+            {actors.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name}
+              </option>
+            ))}
+          </select>
+        </Tooltip>
 
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-cyber-accent font-mono focus:border-cyber-accent focus:outline-none"
-        >
-          <option value="SOCIAL_MEDIA">Sosyal Medya Hesabı</option>
-          <option value="CRYPTO_WALLET">Kripto Cüzdan Adresi</option>
-          <option value="VEHICLE">Araç / Plaka / Varlık</option>
-          <option value="DOMAIN_IP">Domain / IP / Sunucu</option>
-        </select>
+        <Tooltip content="OSINT varlığının kategorisini seçin." className="w-full">
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-cyber-accent font-mono focus:border-cyber-accent focus:outline-none cursor-pointer"
+          >
+            <option value="SOCIAL_MEDIA">Sosyal Medya Hesabı</option>
+            <option value="CRYPTO_WALLET">Kripto Cüzdan Adresi</option>
+            <option value="VEHICLE">Araç / Plaka / Varlık</option>
+            <option value="DOMAIN_IP">Domain / IP / Sunucu</option>
+          </select>
+        </Tooltip>
 
-        <input
-          type="text"
-          placeholder="Tanımlayıcı Değer (örn: @anon, 0x4f...)"
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          className="bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-white focus:border-cyber-accent focus:outline-none col-span-1 md:col-span-2"
-        />
+        <Tooltip content="Tespit edilen kullanıcı adı, cüzdan adresi, plaka veya sunucu IP adresi." className="col-span-1 md:col-span-2 w-full">
+          <input
+            type="text"
+            placeholder="Tanımlayıcı Değer (örn: @anon, 0x4f...)"
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-white focus:border-cyber-accent focus:outline-none"
+          />
+        </Tooltip>
 
-        <button
-          type="submit"
-          className="bg-cyber-accent hover:bg-cyan-400 text-black font-mono font-bold text-xs py-1.5 px-3 rounded flex items-center justify-center gap-1.5 transition-colors"
-        >
-          <Plus size={14} /> Düğüm Ekle
-        </button>
+        <Tooltip content="Yeni dijital varlığı aktörün ağ haritasına bağlar.">
+          <button
+            type="submit"
+            className="w-full bg-cyber-accent hover:bg-cyan-400 text-black font-mono font-bold text-xs py-1.5 px-3 rounded flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <Plus size={14} /> Düğüm Ekle
+          </button>
+        </Tooltip>
       </form>
 
       {/* Görsel İnteraktif Ağ Şeması (SVG Graph) */}
@@ -356,9 +373,11 @@ export const IntelGraph = () => {
                       className="inline-flex items-center gap-1.5 bg-cyber-panel border border-cyber-border px-2 py-1 rounded text-[11px] font-mono text-gray-200"
                     >
                       {getCategoryIcon(ent.category)}
-                      <span className="truncate max-w-[130px]" title={ent.label}>
-                        {ent.label}
-                      </span>
+                      <Tooltip content={`Kategori: ${ent.category}`}>
+                        <span className="truncate max-w-[130px] cursor-help" title={ent.label}>
+                          {ent.label}
+                        </span>
+                      </Tooltip>
                       <button
                         type="button"
                         onClick={() => removeOsintEntity(ent.id)}

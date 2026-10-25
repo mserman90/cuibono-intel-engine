@@ -7,6 +7,8 @@ import { FuturesMatrix } from './components/FuturesMatrix';
 import { GeointMap } from './components/GeointMap';
 import { TimelineAnalysis } from './components/TimelineAnalysis';
 import { ExportReport } from './components/ExportReport';
+import { Tooltip, InfoTooltip } from './components/Tooltip';
+import { UserGuideModal } from './components/UserGuideModal';
 import {
   ShieldAlert,
   UserPlus,
@@ -18,6 +20,7 @@ import {
   Calendar,
   AlertCircle,
   HelpCircle,
+  BookOpen,
 } from 'lucide-react';
 
 export default function App() {
@@ -30,6 +33,8 @@ export default function App() {
     removeEvidence,
     resetCase,
   } = useOsint();
+
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
@@ -112,6 +117,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-cyber-bg text-gray-100 p-4 sm:p-6 lg:p-8 space-y-6">
+      {/* User Guide Modal */}
+      <UserGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
+
       {/* Top Navigation / Header */}
       <header className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-cyber-border pb-5">
         <div className="space-y-1">
@@ -119,22 +127,35 @@ export default function App() {
             <span className="p-1.5 bg-cyber-accent/10 border border-cyber-accent rounded text-cyber-accent">
               <ShieldAlert size={22} />
             </span>
-            <h1 className="text-2xl font-mono font-bold tracking-tight text-white">
-              CuiBono-IntelEngine <span className="text-xs text-cyber-accent font-normal">v1.0-PRO</span>
-            </h1>
+            <Tooltip content="'Cui bono?' (Kimin Çıkarına?): Bir kriz veya saldırıdan kimin kazanç sağladığını matematiksel ve yapılandırılmış yöntemlerle (SATs) tespit eden analitik karar destek platformu.">
+              <h1 className="text-2xl font-mono font-bold tracking-tight text-white cursor-help flex items-center gap-1.5">
+                CuiBono-IntelEngine <span className="text-xs text-cyber-accent font-normal border border-cyber-accent/40 px-1.5 py-0.5 rounded">v1.0-PRO</span>
+              </h1>
+            </Tooltip>
           </div>
           <p className="text-xs text-gray-400 font-mono">
             İstemci Tarafı OSINT, Çıkar Analizi (Cui Bono) & SATs Hipotez Matris Platformu
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleConfirmReset}
-            className="inline-flex items-center gap-1.5 bg-red-950/40 hover:bg-red-900/60 border border-red-800 text-red-300 text-xs px-3 py-1.5 rounded font-mono transition-colors"
-          >
-            <RotateCcw size={13} /> Vakayı Sıfırla
-          </button>
+        <div className="flex items-center gap-2.5">
+          <Tooltip content="Adım adım analiz metodolojisi, SATs formülleri ve kullanım kılavuzunu açar.">
+            <button
+              onClick={() => setIsGuideOpen(true)}
+              className="inline-flex items-center gap-1.5 bg-cyber-accent hover:bg-cyan-400 text-black text-xs px-3.5 py-1.5 rounded font-mono font-bold transition-all shadow-md hover:shadow-cyan-500/20"
+            >
+              <BookOpen size={14} /> Analiz Kılavuzu & Rehber
+            </button>
+          </Tooltip>
+
+          <Tooltip content="Tarayıcının yerel IndexedDB veritabanındaki vaka verilerini sıfırlar ve yeni temiz vaka açar.">
+            <button
+              onClick={handleConfirmReset}
+              className="inline-flex items-center gap-1.5 bg-red-950/40 hover:bg-red-900/60 border border-red-800 text-red-300 text-xs px-3 py-1.5 rounded font-mono transition-colors"
+            >
+              <RotateCcw size={13} /> Sıfırla
+            </button>
+          </Tooltip>
         </div>
       </header>
 
@@ -145,8 +166,9 @@ export default function App() {
           {/* Module 1: Olay Tanımlama */}
           <div className="bg-cyber-panel border border-cyber-border rounded-lg p-5 space-y-3.5 shadow-lg">
             <div className="flex items-center justify-between">
-              <h3 className="font-mono font-bold text-sm text-cyber-accent flex items-center gap-2">
+              <h3 className="font-mono font-bold text-sm text-cyber-accent flex items-center gap-1.5">
                 <Tag size={16} /> Modül 1: Olay Tanımlama
+                <InfoTooltip text="İncelenen vakanın adı, tarihi ve genel etki alanını tanımlayarak analizin kapsamını belirleyin." />
               </h3>
               {caseData.event && (
                 <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800">
@@ -157,7 +179,10 @@ export default function App() {
 
             <form onSubmit={handleSaveEvent} className="space-y-2.5">
               <div>
-                <label className="text-[11px] font-mono text-gray-400 block mb-1">Olay Başlığı</label>
+                <label className="text-[11px] font-mono text-gray-400 flex items-center gap-1 mb-1">
+                  Olay Başlığı
+                  <InfoTooltip text="Örn: 'Kritik Boru Hattı Sabotajı' veya 'Bankacılık Sektörü Fidye Saldırısı'." />
+                </label>
                 <input
                   type="text"
                   placeholder="örn: Kritik Altyapı Siber Sabotajı"
@@ -168,7 +193,10 @@ export default function App() {
               </div>
 
               <div>
-                <label className="text-[11px] font-mono text-gray-400 block mb-1">Olay Tarihi</label>
+                <label className="text-[11px] font-mono text-gray-400 flex items-center gap-1 mb-1">
+                  Olay Tarihi
+                  <InfoTooltip text="Olayın başladığı veya saptandığı tarih. Zaman çizelgesinde referans alınır." />
+                </label>
                 <input
                   type="date"
                   value={incidentDate}
@@ -178,7 +206,10 @@ export default function App() {
               </div>
 
               <div>
-                <label className="text-[11px] font-mono text-gray-400 block mb-1">Olay Özeti</label>
+                <label className="text-[11px] font-mono text-gray-400 flex items-center gap-1 mb-1">
+                  Olay Özeti
+                  <InfoTooltip text="Olayın operasyonel bağlamı, hedef varlık ve ilk tespit edilen etkiler." />
+                </label>
                 <textarea
                   rows={2}
                   placeholder="Olayın kapsamı, gerçekleştiği bağlam ve etkileri..."
@@ -188,24 +219,30 @@ export default function App() {
                 />
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-cyber-accent hover:bg-cyan-400 text-black font-mono font-bold text-xs py-2 rounded transition-colors"
-              >
-                Olayı Kaydet / Güncelle
-              </button>
+              <Tooltip content="Olay detaylarını IndexedDB yerel veritabanına kaydeder veya günceller." className="w-full">
+                <button
+                  type="submit"
+                  className="w-full bg-cyber-accent hover:bg-cyan-400 text-black font-mono font-bold text-xs py-2 rounded transition-colors"
+                >
+                  Olayı Kaydet / Güncelle
+                </button>
+              </Tooltip>
             </form>
           </div>
 
           {/* Module 2: Aktör Tanımlama */}
           <div className="bg-cyber-panel border border-cyber-border rounded-lg p-5 space-y-3.5 shadow-lg">
-            <h3 className="font-mono font-bold text-sm text-cyber-accent flex items-center gap-2">
+            <h3 className="font-mono font-bold text-sm text-cyber-accent flex items-center gap-1.5">
               <UserPlus size={16} /> Modül 2: Aktör Yönetimi
+              <InfoTooltip text="Olaydan fayda veya zarar görebilecek tüm devlet, tehdit grubu, şirket veya konsorsiyumları ekleyin." />
             </h3>
 
             <form onSubmit={handleAddActor} className="space-y-2.5">
               <div>
-                <label className="text-[11px] font-mono text-gray-400 block mb-1">Aktör / Organizasyon Adı</label>
+                <label className="text-[11px] font-mono text-gray-400 flex items-center gap-1 mb-1">
+                  Aktör / Organizasyon Adı
+                  <InfoTooltip text="Örn: 'APT28', 'Global Enerji Şirketi X', 'Devlet Y İstihbaratı'." />
+                </label>
                 <input
                   type="text"
                   placeholder="örn: APT29, Enerji Konsorsiyumu X"
@@ -216,7 +253,10 @@ export default function App() {
               </div>
 
               <div>
-                <label className="text-[11px] font-mono text-gray-400 block mb-1">Başlangıç Hipotez Rolü</label>
+                <label className="text-[11px] font-mono text-gray-400 flex items-center gap-1 mb-1">
+                  Başlangıç Hipotez Rolü
+                  <InfoTooltip text="Aktörün olaydaki varsayılan stratejik pozisyonu. Çıkar analiziyle bu rol test edilir." />
+                </label>
                 <select
                   value={actorRole}
                   onChange={(e) => setActorRole(e.target.value)}
@@ -229,12 +269,14 @@ export default function App() {
                 </select>
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-mono font-bold text-xs py-2 rounded transition-colors flex items-center justify-center gap-1.5"
-              >
-                <Plus size={14} /> Aktör Ekle
-              </button>
+              <Tooltip content="Yeni aktörü çıkar matrisine ve ağ grafiğine dahil eder." className="w-full">
+                <button
+                  type="submit"
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-mono font-bold text-xs py-2 rounded transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <Plus size={14} /> Aktör Ekle
+                </button>
+              </Tooltip>
             </form>
 
             <div className="space-y-1.5 max-h-36 overflow-y-auto pt-1">
@@ -250,13 +292,14 @@ export default function App() {
                       <span className="font-mono font-semibold text-white">{a.name}</span>
                       <span className="text-[10px] text-gray-400 block">{a.role}</span>
                     </div>
-                    <button
-                      onClick={() => removeActor(a.id)}
-                      className="text-red-400 hover:text-red-300 p-1"
-                      title="Sil"
-                    >
-                      <Trash2 size={13} />
-                    </button>
+                    <Tooltip content="Aktörü ve bağlı matris skorlarını kaldır">
+                      <button
+                        onClick={() => removeActor(a.id)}
+                        className="text-red-400 hover:text-red-300 p-1"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </Tooltip>
                   </div>
                 ))
               )}
@@ -265,13 +308,17 @@ export default function App() {
 
           {/* Module: Kanıt Ekle (SATs Çarpanlı) */}
           <div className="bg-cyber-panel border border-cyber-border rounded-lg p-5 space-y-3.5 shadow-lg">
-            <h3 className="font-mono font-bold text-sm text-cyber-accent flex items-center gap-2">
+            <h3 className="font-mono font-bold text-sm text-cyber-accent flex items-center gap-1.5">
               <FileCheck2 size={16} /> İstihbarat Kanıtı & SATs Değerlendirmesi
+              <InfoTooltip text="Açık kaynak istihbaratını (OSINT) 4 SATs kriterine göre tartarak 0.10 - 1.00 arası güvenilirlik çarpanı üretin." />
             </h3>
 
             <form onSubmit={handleAddEvidence} className="space-y-2.5">
               <div>
-                <label className="text-[11px] font-mono text-gray-400 block mb-1">Kanıt Başlığı</label>
+                <label className="text-[11px] font-mono text-gray-400 flex items-center gap-1 mb-1">
+                  Kanıt Başlığı
+                  <InfoTooltip text="Belirlenen bulgunun adı (Örn: 'Borsa Açığa Satış Kayıtları', 'C2 Sunucu Trafiği')." />
+                </label>
                 <input
                   type="text"
                   placeholder="örn: Borsa Açığa Satış Raporu"
@@ -309,12 +356,17 @@ export default function App() {
 
               {/* SATs Metrics */}
               <div className="bg-cyber-bg p-2 rounded border border-cyber-border/80 space-y-1">
-                <span className="text-[10px] font-mono text-cyber-accent font-semibold block">
-                  SATs Güvenilirlik Puanlaması (1-5):
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-cyber-accent font-semibold flex items-center gap-1">
+                    SATs Güvenilirlik Puanlaması (1-5)
+                    <InfoTooltip text="Formül: (Aidiyet + Yetkinlik + Nesnellik + Doğruluk) / 20. Matris puanları bu çarpanla tartılarak dezenformasyon engellenir." />
+                  </span>
+                </div>
                 <div className="grid grid-cols-4 gap-1 text-[10px] font-mono text-center">
                   <div>
-                    <label className="text-gray-400 block">Aidiyet</label>
+                    <Tooltip content="Aidiyet (Attribution): Bilginin kaynağı ve aktörle bağlantısı ne kadar net?">
+                      <label className="text-gray-400 block cursor-help">Aidiyet</label>
+                    </Tooltip>
                     <input
                       type="number"
                       min={1}
@@ -325,7 +377,9 @@ export default function App() {
                     />
                   </div>
                   <div>
-                    <label className="text-gray-400 block">Yetkinlik</label>
+                    <Tooltip content="Yetkinlik (Credentials): Bilgiyi sunan analist veya kaynağın teknik uzmanlığı?">
+                      <label className="text-gray-400 block cursor-help">Yetkinlik</label>
+                    </Tooltip>
                     <input
                       type="number"
                       min={1}
@@ -336,7 +390,9 @@ export default function App() {
                     />
                   </div>
                   <div>
-                    <label className="text-gray-400 block">Nesnellik</label>
+                    <Tooltip content="Nesnellik (Objectivity): Kaynağın tarafsızlığı; manipülasyon veya algı operasyonu riski?">
+                      <label className="text-gray-400 block cursor-help">Nesnellik</label>
+                    </Tooltip>
                     <input
                       type="number"
                       min={1}
@@ -347,7 +403,9 @@ export default function App() {
                     />
                   </div>
                   <div>
-                    <label className="text-gray-400 block">Doğruluk</label>
+                    <Tooltip content="Doğrulanabilirlik (Verifiability): Bilgi harici bağımsız kaynaklarla teyit edildi mi?">
+                      <label className="text-gray-400 block cursor-help">Doğruluk</label>
+                    </Tooltip>
                     <input
                       type="number"
                       min={1}
@@ -360,12 +418,14 @@ export default function App() {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-cyber-accent/90 hover:bg-cyber-accent text-black font-mono font-bold text-xs py-2 rounded transition-colors flex items-center justify-center gap-1.5"
-              >
-                <Plus size={14} /> Kanıt Ekle
-              </button>
+              <Tooltip content="Kanıtı ağırlıklı katsayısıyla sisteme kaydeder." className="w-full">
+                <button
+                  type="submit"
+                  className="w-full bg-cyber-accent/90 hover:bg-cyber-accent text-black font-mono font-bold text-xs py-2 rounded transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <Plus size={14} /> Kanıt Ekle
+                </button>
+              </Tooltip>
             </form>
 
             <div className="space-y-1 max-h-24 overflow-y-auto">
@@ -374,12 +434,15 @@ export default function App() {
                   key={ev.id}
                   className="flex justify-between items-center text-[11px] bg-cyber-bg px-2 py-1 rounded border border-cyber-border/40 font-mono"
                 >
-                  <span className="truncate max-w-[170px]" title={ev.title}>
-                    {ev.title} (x{ev.reliabilityMultiplier})
-                  </span>
+                  <Tooltip content={`Kaynak: ${ev.sourceType} | Güvenilirlik Katsayısı: ${ev.reliabilityMultiplier}`}>
+                    <span className="truncate max-w-[170px] cursor-help" title={ev.title}>
+                      {ev.title} (x{ev.reliabilityMultiplier})
+                    </span>
+                  </Tooltip>
                   <button
                     onClick={() => removeEvidence(ev.id)}
                     className="text-red-400 hover:text-red-300"
+                    title="Kanıtı Sil"
                   >
                     ×
                   </button>

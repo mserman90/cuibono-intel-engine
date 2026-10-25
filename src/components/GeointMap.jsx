@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FullscreenToggle } from './FullscreenToggle';
 import { MapPin, Plus, Navigation, Crosshair } from 'lucide-react';
+import { Tooltip, InfoTooltip } from './Tooltip';
 import L from 'leaflet';
 
 export const GeointMap = () => {
@@ -128,6 +129,7 @@ export const GeointMap = () => {
           <h2 className="text-xl font-mono font-bold text-white flex items-center gap-2">
             <MapPin className="text-cyber-accent" size={20} />
             <span className="text-cyber-accent">#07</span> Coğrafi İstihbarat (GEOINT) Haritası
+            <InfoTooltip text="Fiziksel olay yerlerini, komuta merkezlerini (HQ) ve siber saldırı hedeflerini haritada koordinatlandırarak mekânsal istihbarat analizi yapın." />
           </h2>
           <p className="text-xs text-gray-400 mt-0.5">
             Olay mahalleri, veri merkezleri ve operasyon üslerini haritada konumlandırın. (Haritaya tıklayarak koordinat seçebilirsiniz).
@@ -137,43 +139,57 @@ export const GeointMap = () => {
       </div>
 
       <form onSubmit={handleAddMarker} className="bg-cyber-bg p-3.5 rounded border border-cyber-border grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2.5">
-        <input
-          type="text"
-          placeholder="Lokasyon / Hedef Adı"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          className="bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-white focus:border-cyber-accent focus:outline-none"
-        />
-        <select
-          value={newType}
-          onChange={(e) => setNewType(e.target.value)}
-          className="bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-cyber-accent font-mono focus:border-cyber-accent focus:outline-none"
-        >
-          <option value="NODE">Düğüm / Tesis (NODE)</option>
-          <option value="HQ">Komuta Merkezi (HQ)</option>
-          <option value="TARGET">Siber / Fiziksel Hedef (TARGET)</option>
-          <option value="MANUAL">Özel Nokta (MANUAL)</option>
-        </select>
-        <input
-          type="text"
-          placeholder="Enlem (Lat)"
-          value={newLat}
-          onChange={(e) => setNewLat(e.target.value)}
-          className="bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-white font-mono focus:border-cyber-accent focus:outline-none"
-        />
-        <input
-          type="text"
-          placeholder="Boylam (Lng)"
-          value={newLng}
-          onChange={(e) => setNewLng(e.target.value)}
-          className="bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-white font-mono focus:border-cyber-accent focus:outline-none"
-        />
-        <button
-          type="submit"
-          className="bg-cyber-accent hover:bg-cyan-400 text-black font-mono font-bold text-xs py-1.5 px-3 rounded flex items-center justify-center gap-1.5 transition-colors"
-        >
-          <Plus size={14} /> Nokta Ekle
-        </button>
+        <Tooltip content="Konumlandırılan noktanın adı (örn: 'Frankfurt Veri Merkezi', 'St. Petersburg Ofisi')." className="w-full">
+          <input
+            type="text"
+            placeholder="Lokasyon / Hedef Adı"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-white focus:border-cyber-accent focus:outline-none"
+          />
+        </Tooltip>
+
+        <Tooltip content="Nokta tipini belirleyin (Komuta Merkezi, Siber Hedef, Altyapı Düğümü)." className="w-full">
+          <select
+            value={newType}
+            onChange={(e) => setNewType(e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-cyber-accent font-mono focus:border-cyber-accent focus:outline-none cursor-pointer"
+          >
+            <option value="NODE">Düğüm / Tesis (NODE)</option>
+            <option value="HQ">Komuta Merkezi (HQ)</option>
+            <option value="TARGET">Siber / Fiziksel Hedef (TARGET)</option>
+            <option value="MANUAL">Özel Nokta (MANUAL)</option>
+          </select>
+        </Tooltip>
+
+        <Tooltip content="Enlem koordinatı. Haritaya doğrudan tıklayarak otomatik doldurabilirsiniz." className="w-full">
+          <input
+            type="text"
+            placeholder="Enlem (Lat)"
+            value={newLat}
+            onChange={(e) => setNewLat(e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-white font-mono focus:border-cyber-accent focus:outline-none"
+          />
+        </Tooltip>
+
+        <Tooltip content="Boylam koordinatı. Haritaya doğrudan tıklayarak otomatik doldurabilirsiniz." className="w-full">
+          <input
+            type="text"
+            placeholder="Boylam (Lng)"
+            value={newLng}
+            onChange={(e) => setNewLng(e.target.value)}
+            className="w-full bg-cyber-panel border border-cyber-border rounded px-3 py-1.5 text-xs text-white font-mono focus:border-cyber-accent focus:outline-none"
+          />
+        </Tooltip>
+
+        <Tooltip content="Girilen koordinatları radar piniyle haritaya ekler.">
+          <button
+            type="submit"
+            className="w-full bg-cyber-accent hover:bg-cyan-400 text-black font-mono font-bold text-xs py-1.5 px-3 rounded flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <Plus size={14} /> Nokta Ekle
+          </button>
+        </Tooltip>
       </form>
 
       <div
@@ -184,22 +200,26 @@ export const GeointMap = () => {
       {/* Marker list pills */}
       <div className="flex flex-wrap gap-2 pt-1">
         {markers.map((m) => (
-          <span
-            key={m.id}
-            className="inline-flex items-center gap-1.5 bg-cyber-bg border border-cyber-border px-2.5 py-1 rounded text-xs font-mono text-gray-300"
-          >
-            <Crosshair size={12} className="text-cyber-accent" />
-            <span>{m.title}</span>
-            <span className="text-[10px] text-gray-500">[{m.type}]</span>
-            <button
-              type="button"
-              onClick={() => removeMarker(m.id)}
-              className="text-red-400 hover:text-red-300 ml-1 text-xs"
-              title="Sil"
+          <Tooltip key={m.id} content={`Koordinat: [${m.lat}, ${m.lng}] | Tip: ${m.type}`}>
+            <span
+              className="inline-flex items-center gap-1.5 bg-cyber-bg border border-cyber-border px-2.5 py-1 rounded text-xs font-mono text-gray-300 cursor-help"
             >
-              ×
-            </button>
-          </span>
+              <Crosshair size={12} className="text-cyber-accent" />
+              <span>{m.title}</span>
+              <span className="text-[10px] text-gray-500">[{m.type}]</span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeMarker(m.id);
+                }}
+                className="text-red-400 hover:text-red-300 ml-1 text-xs"
+                title="Haritadan Sil"
+              >
+                ×
+              </button>
+            </span>
+          </Tooltip>
         ))}
       </div>
     </div>

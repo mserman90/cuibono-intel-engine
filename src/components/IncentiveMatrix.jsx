@@ -1,16 +1,37 @@
 import React, { useState } from 'react';
 import { useOsint } from '../context/OsintContext';
-import { Award, AlertCircle, Edit3 } from 'lucide-react';
+import { Award, AlertCircle, Edit3, HelpCircle } from 'lucide-react';
+import { Tooltip, InfoTooltip } from './Tooltip';
 
 export const IncentiveMatrix = () => {
   const { caseData, upsertBenefitScore, getRankedActors } = useOsint();
   const [selectedCell, setSelectedCell] = useState(null);
 
   const CATEGORIES = [
-    { key: 'FINANCIAL', label: 'Finansal (FININT)', desc: 'Ekonomik kazanç, varlık transferi, borsa, fonlama' },
-    { key: 'GEOPOLITICAL', label: 'Politik / Jeopolitik', desc: 'Bölgesel etki, güç dengesi, seçim, rejim çıkarı' },
-    { key: 'CYBER_DATA', label: 'Siber / Veri', desc: 'Fikri mülkiyet, sızdırılan veriler, casusluk avantajı' },
-    { key: 'REPUTATION', label: 'İtibar / Algı', desc: 'Dezenformasyon, algı operasyonu, caydırıcılık' },
+    {
+      key: 'FINANCIAL',
+      label: 'Finansal (FININT)',
+      desc: 'Ekonomik kazanç, varlık transferi, borsa, fonlama',
+      tooltip: 'Finansal İstihbarat (FININT): Hisse senedi açığa satış, döviz dalgalanmaları, enerji kontratları ve kaynak transferlerinden sağlanan net ekonomik kar veya zarar.',
+    },
+    {
+      key: 'GEOPOLITICAL',
+      label: 'Politik / Jeopolitik',
+      desc: 'Bölgesel etki, güç dengesi, seçim, rejim çıkarı',
+      tooltip: 'Politik / Jeopolitik Çıkar: Bölgesel nüfuz alanı genişlemesi, seçim manipülasyonu, ittifak dengeleri ve rejim gücünün pekişmesi.',
+    },
+    {
+      key: 'CYBER_DATA',
+      label: 'Siber / Veri',
+      desc: 'Fikri mülkiyet, sızdırılan veriler, casusluk avantajı',
+      tooltip: 'Siber & Veri İstihbaratı: Fikri mülkiyet hırsızlığı, kritik altyapı zaafiyeti oluşturma, casusluk üstünlüğü ve veri sızıntısı kazançları.',
+    },
+    {
+      key: 'REPUTATION',
+      label: 'İtibar / Algı',
+      desc: 'Dezenformasyon, algı operasyonu, caydırıcılık',
+      tooltip: 'İtibar & Algı Yönetimi: Dezenformasyon başarısı, rakip aktörün küresel itibarının çökertilmesi ve caydırıcılık algısı.',
+    },
   ];
 
   if (!caseData.actors || caseData.actors.length === 0) {
@@ -41,6 +62,7 @@ export const IncentiveMatrix = () => {
           <div>
             <h2 className="text-xl font-mono font-bold text-white flex items-center gap-2">
               <span className="text-cyber-accent">#03</span> Cui Bono Matris Motoru
+              <InfoTooltip text="Aktörlerin 4 ana boyuttaki kazanç ve kayıplarını (-5 ile +5) puanlayarak ağırlıklı net çıkar skorunu hesaplar." />
             </h2>
             <p className="text-xs text-gray-400 mt-0.5">
               Ham skorlar (-5 ile +5), kanıtların güvenilirlik çarpanları ile tartılarak net ağırlıklı skora dönüştürülür.
@@ -51,14 +73,31 @@ export const IncentiveMatrix = () => {
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-cyber-border text-xs font-mono text-gray-300">
-              <th className="py-3 px-4 bg-cyber-bg/60 w-1/4">Aktör</th>
+              <th className="py-3 px-4 bg-cyber-bg/60 w-1/4">
+                <span className="flex items-center gap-1">
+                  Aktör
+                  <InfoTooltip text="İncelenen vaka ile doğrudan veya dolaylı ilişkili taraflar." />
+                </span>
+              </th>
               {CATEGORIES.map((c) => (
                 <th key={c.key} className="py-3 px-4 bg-cyber-bg/60">
-                  <div className="font-semibold">{c.label}</div>
+                  <Tooltip content={c.tooltip}>
+                    <div className="cursor-help flex items-center gap-1">
+                      <span className="font-semibold text-white">{c.label}</span>
+                      <HelpCircle size={11} className="text-cyber-accent" />
+                    </div>
+                  </Tooltip>
                   <div className="text-[10px] text-gray-400 font-sans font-normal truncate max-w-[150px]">{c.desc}</div>
                 </th>
               ))}
-              <th className="py-3 px-4 bg-cyber-bg/90 text-right font-bold text-cyber-accent">Ağırlıklı Net Skor</th>
+              <th className="py-3 px-4 bg-cyber-bg/90 text-right font-bold text-cyber-accent">
+                <Tooltip content="Formül: ∑(Ham Skor × Kanıt Güvenilirlik Çarpanı). Manipüle edilmemiş gerçekçi çıkar büyüklüğünü yansıtır.">
+                  <span className="cursor-help flex items-center justify-end gap-1">
+                    Ağırlıklı Net Skor
+                    <HelpCircle size={11} className="text-cyber-accent" />
+                  </span>
+                </Tooltip>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-cyber-border text-sm">
@@ -75,44 +114,50 @@ export const IncentiveMatrix = () => {
                     return (
                       <td key={cat.key} className="py-3 px-4 border-l border-cyber-border/50">
                         <div className="flex items-center justify-between mb-1.5">
-                          <span
-                            className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${
-                              cell.rawScore > 0
-                                ? 'bg-emerald-950 text-cyber-winner'
-                                : cell.rawScore < 0
-                                ? 'bg-red-950 text-cyber-loser'
-                                : 'bg-gray-800 text-gray-400'
-                            }`}
-                          >
-                            {cell.rawScore > 0 ? `+${cell.rawScore}` : cell.rawScore}
-                          </span>
-                          <button
-                            onClick={() => setSelectedCell({ actorId: actor.id, category: cat.key })}
-                            className="inline-flex items-center gap-1 text-[11px] text-cyber-accent hover:underline"
-                          >
-                            <Edit3 size={10} />
-                            {cell.justification ? 'Gerekçe (Dolu)' : 'Gerekçe Yaz'}
-                          </button>
+                          <Tooltip content={`Ham Puan: ${cell.rawScore} (-5: Ağır Kayıp, 0: Nötr, +5: Büyük Kazanç)`}>
+                            <span
+                              className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded cursor-help ${
+                                cell.rawScore > 0
+                                  ? 'bg-emerald-950 text-cyber-winner'
+                                  : cell.rawScore < 0
+                                  ? 'bg-red-950 text-cyber-loser'
+                                  : 'bg-gray-800 text-gray-400'
+                              }`}
+                            >
+                              {cell.rawScore > 0 ? `+${cell.rawScore}` : cell.rawScore}
+                            </span>
+                          </Tooltip>
+                          <Tooltip content="Bu puanın istihbari ve analitik gerekçesini yazın/düzenleyin">
+                            <button
+                              onClick={() => setSelectedCell({ actorId: actor.id, category: cat.key })}
+                              className="inline-flex items-center gap-1 text-[11px] text-cyber-accent hover:underline"
+                            >
+                              <Edit3 size={10} />
+                              {cell.justification ? 'Gerekçe (Dolu)' : 'Gerekçe Yaz'}
+                            </button>
+                          </Tooltip>
                         </div>
-                        <input
-                          type="range"
-                          min={-5}
-                          max={5}
-                          step={1}
-                          value={cell.rawScore}
-                          onChange={(e) =>
-                            upsertBenefitScore(
-                              actor.id,
-                              cat.key,
-                              Number(e.target.value),
-                              cell.evidenceIds,
-                              cell.justification
-                            )
-                          }
-                          className="w-full accent-cyber-accent cursor-pointer"
-                        />
+                        <Tooltip content={`Sürgüyü ayarlayın: ${cell.rawScore}`}>
+                          <input
+                            type="range"
+                            min={-5}
+                            max={5}
+                            step={1}
+                            value={cell.rawScore}
+                            onChange={(e) =>
+                              upsertBenefitScore(
+                                actor.id,
+                                cat.key,
+                                Number(e.target.value),
+                                cell.evidenceIds,
+                                cell.justification
+                              )
+                            }
+                            className="w-full accent-cyber-accent cursor-pointer"
+                          />
+                        </Tooltip>
                         {cell.justification && (
-                          <div className="text-[10px] text-gray-400 truncate max-w-[140px] mt-0.5 italic">
+                          <div className="text-[10px] text-gray-400 truncate max-w-[140px] mt-0.5 italic" title={cell.justification}>
                             "{cell.justification}"
                           </div>
                         )}
@@ -120,17 +165,19 @@ export const IncentiveMatrix = () => {
                     );
                   })}
                   <td className="py-4 px-4 text-right font-mono font-bold text-lg border-l border-cyber-border">
-                    <span
-                      className={
-                        netScore > 0
-                          ? 'text-cyber-winner'
-                          : netScore < 0
-                          ? 'text-cyber-loser'
-                          : 'text-gray-400'
-                      }
-                    >
-                      {netScore > 0 ? `+${netScore}` : netScore}
-                    </span>
+                    <Tooltip content={`Toplam ağırlıklı skor: ${netScore}`}>
+                      <span
+                        className={`cursor-help ${
+                          netScore > 0
+                            ? 'text-cyber-winner'
+                            : netScore < 0
+                            ? 'text-cyber-loser'
+                            : 'text-gray-400'
+                        }`}
+                      >
+                        {netScore > 0 ? `+${netScore}` : netScore}
+                      </span>
+                    </Tooltip>
                   </td>
                 </tr>
               );
@@ -177,6 +224,7 @@ export const IncentiveMatrix = () => {
       <div className="bg-cyber-panel border border-cyber-border rounded-lg p-5 shadow-lg">
         <h3 className="text-base font-mono font-bold text-white mb-4 flex items-center gap-2">
           <Award className="text-cyber-accent" size={18} /> Sıralama: En Olası Nihai Yararlananlar
+          <InfoTooltip text="En yüksek pozitif puana sahip aktör, Cui Bono prensibine göre olaydan en yüksek çıkar sağlayan baş aktördür." />
         </h3>
         <div className="space-y-3">
           {rankedActors.map(({ actor, netScore }, idx) => {
